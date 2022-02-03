@@ -9,6 +9,7 @@
     <Variables>
         <Variable Name="ModName" Value="Mass Follower Command Menu"/>
         <Variable Name="MyProject" Value="."/>
+        <Variable Name="Ver" Value="1"/>
         <Variable Name="Dist" Value="../bin"/>
     </Variables>
     <Imports>
@@ -21,7 +22,7 @@
         <Folder>@MyProject\Scripts\Source</Folder>
     </Folders>
     <ZipFiles Output="@Dist">
-        <ZipFile Name="@ModName" RootDir="@MyProject" Compression="deflate">
+        <ZipFile Name="@ModName v@Ver" RootDir="@MyProject" Compression="deflate">
              <Match>*.pex|*.psc|*.esp|*.swf|*.txt</Match>
         </ZipFile>
     </ZipFiles>

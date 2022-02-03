@@ -14,24 +14,32 @@ class QuickFollowerMenu extends MovieClip
     var StopWaiting_Option:MovieClip;
 	var StopWaiting_Width: Number;
 	var StopWaiting_Height: Number;
+	var StopWaiting_Color: Color;
 	
     var Wait_Input:MovieClip;
     var Wait_Option:MovieClip;
 	var Wait_Width: Number;
 	var Wait_Height: Number;
+	var Wait_Color: Color;
 	
     var Teleport_Input:MovieClip;
     var Teleport_Option:MovieClip;
 	var Teleport_Width: Number;
 	var Teleport_Height: Number;
+	var Teleport_Color: Color;
 	
     var Inventory_Input:MovieClip;
     var Inventory_Option:MovieClip;
 	var Inventory_Width: Number;
 	var Inventory_Height: Number;
+	var Inventory_Color: Color;
 	
 	var shines_mc:MovieClip;
 	var currentSelection:Number;
+	
+	var highlighted:Color;
+	var unhighlighted:Color;
+
 
 	function QuickFollowerMenu()
 	{
@@ -39,6 +47,19 @@ class QuickFollowerMenu extends MovieClip
 		shines_mc._alpha = 0;
 		currentSelection = 0;
 		FocusHandler.instance.setFocus(this,0);
+		
+		//StopWaiting_Color = new Color(StopWaiting_Option);
+		//Wait_Color = new Color(Wait_Option);
+		//Teleport_Color = new Color(Teleport_Option);
+		//Inventory_Color = new Color(Inventory_Option);
+		
+		Inventory_Option._alpha = 70;
+		Wait_Option._alpha = 70;
+		StopWaiting_Option._alpha = 70;
+		Teleport_Option._alpha = 70;
+		
+		//unhighlighted = new color(0xB3B3B3);
+		//highlighted = new color(0xE3E3E3);
 
 		StopWaiting_Input.onRollOver = function()
 		{
@@ -153,6 +174,12 @@ class QuickFollowerMenu extends MovieClip
 		Wait_Option._alpha = 70;
 		StopWaiting_Option._alpha = 70;
 		Teleport_Option._alpha = 70;
+		
+		//StopWaiting_Color.setRGB(0xB3B3B3);
+		//Wait_Color.setRGB(0xB3B3B3);
+		//Teleport_Color.setRGB(0xB3B3B3);
+		//Inventory_Color.setRGB(0xB3B3B3);
+		
 		shines_mc._alpha = 0;
 		GameDelegate.call("HighlightMenu", [aiSelection]);
 		GameDelegate.call("PlaySound",["UISkillsBackward"]);
@@ -170,6 +197,7 @@ class QuickFollowerMenu extends MovieClip
 		
 		switch(aiSelection){
 			case 1:
+				//StopWaiting_Color.setRGB(0xE3E3E3);
 				StopWaiting_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
@@ -179,6 +207,7 @@ class QuickFollowerMenu extends MovieClip
 				shines_mc._rotation = 135;
 				break;
 			case 2:
+				//Wait_Color.setRGB(0xE3E3E3);
 				Wait_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
@@ -188,6 +217,7 @@ class QuickFollowerMenu extends MovieClip
 				shines_mc._rotation = 45;
 				break;
 			case 3:
+				//Teleport_Color.setRGB(0xE3E3E3);
 				Teleport_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
@@ -197,6 +227,7 @@ class QuickFollowerMenu extends MovieClip
 				shines_mc._rotation = -135;
 				break;
 			case 4:
+				//Inventory_Color.setRGB(0xE3E3E3);
 				Inventory_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
