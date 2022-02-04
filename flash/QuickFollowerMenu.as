@@ -147,19 +147,35 @@ class QuickFollowerMenu extends MovieClip
 		if (GlobalFunc.IsKeyPressed(details)){
 			if (details.navEquivalent == NavigationCode.UP)
 			{
+				if (currentSelection == 1){
+					handleSelection(1);
+				} else {
 				handleHighlight(1);
+				}
 			}
 			else if (details.navEquivalent == NavigationCode.LEFT)
 			{
-				handleHighlight(2);
+				if (currentSelection == 2){
+					handleSelection(2);
+				} else {
+					handleHighlight(2);
+				}
 			}
 			else if (details.navEquivalent == NavigationCode.RIGHT)
 			{
-				handleHighlight(3);
+				if (currentSelection == 3){
+					handleSelection(3);
+				} else {
+					handleHighlight(3);
+				}
 			}
 			else if (details.navEquivalent == NavigationCode.DOWN)
 			{
-				handleHighlight(4);
+				if (currentSelection == 4){
+					handleSelection(4);
+				} else {
+					handleHighlight(4);
+				}
 			}
 			else if (details.navEquivalent == NavigationCode.GAMEPAD_A)
 			{

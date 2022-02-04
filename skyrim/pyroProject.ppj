@@ -7,23 +7,24 @@
     Anonymize="true" 
     Zip="true">
     <Variables>
-        <Variable Name="ModName" Value="Mass Follower Command Menu"/>
+        <Variable Name="ModName" Value="Swiftly Order Squad"/>
         <Variable Name="MyProject" Value="."/>
-        <Variable Name="Ver" Value="1"/>
+        <Variable Name="Ver" Value="1.0"/>
         <Variable Name="Dist" Value="../bin"/>
     </Variables>
     <Imports>
-        <Import>@MyProject\Scripts\Source</Import>
+        <Import>@MyProject\Source\Scripts</Import>
         <Import>https://github.com/MrOctopus/nl_online/tree/main/skse64/source</Import>
+        <Import>https://github.com/eeveelo/PapyrusUtil/tree/master/Scripts/Source</Import>
         <Import>https://github.com/MrOctopus/nl_online/tree/main/sse/source</Import>
         <Import>https://github.com/Ryan-rsm-McKenzie/ConsoleUtilSSE/tree/master/src/papyrus</Import>
     </Imports>
     <Folders>
-        <Folder>@MyProject\Scripts\Source</Folder>
+        <Folder>@MyProject\Source\Scripts</Folder>
     </Folders>
     <ZipFiles Output="@Dist">
-        <ZipFile Name="@ModName v@Ver" RootDir="@MyProject" Compression="deflate">
-             <Match>*.pex|*.psc|*.esp|*.swf|*.txt</Match>
+        <ZipFile Name="@ModName @Ver" RootDir="@MyProject" Compression="deflate">
+             <Match>*.pex|*.psc|*.esp|*.swf|*.txt|*.json|*.ini</Match>
         </ZipFile>
     </ZipFiles>
 </PapyrusProject>
