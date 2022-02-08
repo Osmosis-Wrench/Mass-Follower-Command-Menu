@@ -5,6 +5,7 @@ actor property playerRef auto
 string property waitingText auto
 string property stopWaitingText auto
 formList property qfcList Auto
+faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
 int commandFollow
@@ -66,24 +67,33 @@ endEvent
 
 Function doCommand(int command)
 	GotoState("busy")
-	int n = qfcList.GetSize()
-	while n
-		n -= 1
-		Actor follower = qfcList.GetAt(n) as Actor
-		if follower && follower.IsPlayerTeammate()
-			if command == commandWait
-				WaitActor(follower)
-			elseIf command == commandFollow 
-				StopWaitingActor(follower)
-			elseIf command == commandInventory 
-				follower.OpenInventory()
-				Utility.Wait(0.01)
-			elseIf command == commandTeleport
-				follower.MoveTo(playerRef)
+	Actor crosshairActor = Game.GetCurrentCrosshairRef() as Actor
+	if IsFollower(crosshairActor)
+		doFollower(command, crosshairActor)
+	else
+		int n = qfcList.GetSize()
+		while n
+			n -= 1
+			Actor follower = qfcList.GetAt(n) as Actor
+			if IsFollower(follower)
+				doFollower(command, follower)
 			endIf
-		endIf
-	endWhile
+		endWhile
+	endIf
 	GotoState("")
+endFunction
+
+function doFollower(int command, Actor follower)
+	if command == commandWait
+		WaitActor(follower)
+	elseIf command == commandFollow 
+		StopWaitingActor(follower)
+	elseIf command == commandInventory 
+		follower.OpenInventory(true)
+		Utility.Wait(0.01)
+	elseIf command == commandTeleport
+		follower.MoveTo(playerRef)
+	endIf
 endFunction
 
 function StopWaitingActor(actor akActor)
@@ -100,4 +110,8 @@ function WaitActor(actor akActor)
 		akActor.EvaluatePackage()
 		Debug.Notification(akActor.GetDisplayName() + waitingText)
 	endIf
+endFunction
+
+bool function IsFollower(actor akActor)
+	return akActor && (akActor.IsPlayerTeammate() || akActor.GetFactionRank(PetFramework_PetFollowingFaction) >= 1)
 endFunction
