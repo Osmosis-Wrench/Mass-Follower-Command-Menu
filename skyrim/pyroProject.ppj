@@ -9,7 +9,7 @@
     <Variables>
         <Variable Name="ModName" Value="Swiftly Order Squad"/>
         <Variable Name="MyProject" Value="."/>
-        <Variable Name="Ver" Value="1.1"/>
+        <Variable Name="Ver" Value="1.2"/>
         <Variable Name="Dist" Value="../bin"/>
     </Variables>
     <Imports>

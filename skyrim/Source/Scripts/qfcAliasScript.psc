@@ -89,11 +89,17 @@ function doFollower(int command, Actor follower)
 	elseIf command == commandFollow 
 		StopWaitingActor(follower)
 	elseIf command == commandInventory 
-		follower.OpenInventory(true)
-		Utility.Wait(0.01)
+		OpenInventoryActor(follower)
 	elseIf command == commandTeleport
 		follower.MoveTo(playerRef)
 	endIf
+endFunction
+
+function OpenInventoryActor(actor akActor)
+	while Utility.IsInMenuMode()
+		Utility.Wait(0.5)
+	endWhile
+	akActor.OpenInventory(true)
 endFunction
 
 function StopWaitingActor(actor akActor)
