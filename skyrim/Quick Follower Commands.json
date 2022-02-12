@@ -1,6 +1,7 @@
 {
 	"int" : 
 	{
-		"dxcode" : 40
+		"dxcode" : 40,
+		"showSpell": 0
 	}
 }

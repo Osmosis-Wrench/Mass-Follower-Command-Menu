@@ -43,6 +43,11 @@ class QuickFollowerMenu extends MovieClip
 	
 	var highlighted:Color;
 	var unhighlighted:Color;
+	
+	var followerList:MovieClip;
+	var followers: Array = new Array();
+	var crosshairMode: Boolean = false;
+	var menuShown: Boolean = false;
 
 
 	function QuickFollowerMenu()
@@ -58,14 +63,6 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Color = new Color(Inventory_Option.inventory_icon);
 		
 		resetColor();
-
-		//Inventory_Option._alpha = 70;
-		//Wait_Option._alpha = 70;
-		//StopWaiting_Option._alpha = 70;
-		//Teleport_Option._alpha = 70;
-		
-		//unhighlighted = new color(0xB3B3B3);
-		//highlighted = new color(0xE3E3E3);
 
 		StopWaiting_Input.onRollOver = function()
 		{
@@ -116,35 +113,112 @@ class QuickFollowerMenu extends MovieClip
 		};
 	}
 	
+
+	
 	function onLoad():Void
 	{
 		this._alpha = 0;
-		
-		StopWaiting_Width = StopWaiting_Option._width
-		StopWaiting_Height = StopWaiting_Option._height
-		Wait_Width = Wait_Option._width
-		Wait_Height = Wait_Option._height
-		Teleport_Width = Teleport_Option._width
-		Teleport_Height = Teleport_Option._height
-		Inventory_Width = Inventory_Option._width
-		Inventory_Height = Inventory_Option._height
-		
-		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
+		StopWaiting_Width = StopWaiting_Option._width;
+		StopWaiting_Height = StopWaiting_Option._height;
+		Wait_Width = Wait_Option._width;
+		Wait_Height = Wait_Option._height;
+		Teleport_Width = Teleport_Option._width;
+		Teleport_Height = Teleport_Option._height;
+		Inventory_Width = Inventory_Option._width;
+		Inventory_Height = Inventory_Option._height;
+		//getFollowersFromString("Jenassa,924585,","","");
+		trace(crosshairMode);
 	}
-
-	function onInputRectMouseOver(aiSelection:Number):Void
+	
+	function getFollowersFromString(followerString: String, followerStringDisabled: String, fromCrosshairModeTarget: String): Void
 	{
-		handleHighlight(aiSelection);
+		followerString = clean(followerString);
+		var parse = followerString.split(",");
+		for (var i = 0; i < parse.length; i += 2)
+		{
+			addFollower(parse[i], true, parse[i+1]);
+		}
+		if (followerStringDisabled != ""){
+			followerStringDisabled = clean(followerStringDisabled);
+			parse = followerStringDisabled.split(",");
+			for (var i = 0; i < parse.length; i += 2)
+			{
+				for (var x = 0; x < followers.length; x++)
+				{
+					if (followers[x][2] == parse[i+1])
+					{
+						followers[x][1] = false;
+					}
+				}
+			}
+		}
+		if (fromCrosshairModeTarget != ""){
+			crosshairMode = true;
+			parse = fromCrosshairModeTarget.split(",");
+			for (var i = 0; i < followers.length; i++)
+			{
+				if (followers[i][2] != parse[1])
+				{
+					followers[i][1] = false;
+				} else {
+					followers[i][1] = true;
+				}
+			}
+		}
+		followerList.FollowerName.htmlText = constructFollowerString();
+		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
+		menuShown = true;
+	}
+	
+	function addFollower(followerName:String, followerEnabled:Boolean, followerFormId:String)
+	{
+		var newFollower = [followerName, followerEnabled, followerFormId];
+		followers.push(newFollower);
+	}
+	
+	function constructFollowerString(): String
+	{
+		var ret: String = "|";
+		for (var i = 0; i < followers.length; i++)
+		{
+			var color;
+			//followers[i][1] ? color =  "0xB3B3B3" : color = "#E3E3E3";
+			followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
+			ret = ret + "  <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+" "+followers[i][1]+"</A>"+"</FONT>"+"  |";
+		}
+		return ret;
+	}
+	
+	function FollowerCallback(arg)
+	{
+		followers[arg][1] = !followers[arg][1];
+		trace("You clicked on follower "+followers[arg][0]+" toggling them to "+followers[arg][1]);
+		var m = "normal"
+		if (crosshairMode) { m = "crosshair"; }
+		trace(m);
+		if (followers[arg][1]){
+			skse.SendModEvent("QuickFollowerMenu_Toggle",m,1,parseInt(followers[arg][2]));
+		}
+		else {
+			skse.SendModEvent("QuickFollowerMenu_Toggle",m,0,parseInt(followers[arg][2]));
+		}
+		
+		followerList.FollowerName.htmlText = constructFollowerString();
+	}
+	
+	function onInputRectMouseOver(aiSelection:Number): Void
+	{
+		if (menuShown){ handleHighlight(aiSelection); }
     }
 
-    function onInputRectClick(aiSelection:Number):Void
+    function onInputRectClick(aiSelection:Number): Void
 	{
-		handleSelection(aiSelection);
+		if (menuShown){ handleSelection(aiSelection); }
     }
 	
 	function handleInput(details: InputDetails, pathToFocus: Array): Void
 	{
-		if (GlobalFunc.IsKeyPressed(details)){
+		if (GlobalFunc.IsKeyPressed(details) && menuShown){
 			if (details.navEquivalent == NavigationCode.UP)
 			{
 				if (currentSelection == 1){
@@ -192,10 +266,6 @@ class QuickFollowerMenu extends MovieClip
 	{
 		trace("Highlight: "+aiSelection);
 		currentSelection = aiSelection;
-		//Inventory_Option._alpha = 70;
-		//Wait_Option._alpha = 70;
-		//StopWaiting_Option._alpha = 70;
-		//Teleport_Option._alpha = 70;
 		
 		resetColor();
 		
@@ -218,7 +288,6 @@ class QuickFollowerMenu extends MovieClip
 			case 1:
 				StopWaiting_Color.setRGB(0xE3E3E3);
 				StopWaiting_Option.stopwaiting_text.textColor = 0xE3E3E3;
-				//StopWaiting_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
 				Tween.LinearTween(StopWaiting_Option,"_width", StopWaiting_Option._width, StopWaiting_Width+scale, 0.2);
@@ -229,7 +298,6 @@ class QuickFollowerMenu extends MovieClip
 			case 2:
 				Wait_Color.setRGB(0xE3E3E3);
 				Wait_Option.wait_text.textColor = 0xE3E3E3;
-				//Wait_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
 				Tween.LinearTween(Wait_Option,"_width", Wait_Option._width, Wait_Width+scale, 0.2);
@@ -240,7 +308,6 @@ class QuickFollowerMenu extends MovieClip
 			case 3:
 				Teleport_Color.setRGB(0xE3E3E3);
 				Teleport_Option.teleport_text.textColor = 0xE3E3E3;
-				//Teleport_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
 				Tween.LinearTween(Teleport_Option,"_width", Teleport_Option._width, Teleport_Width+scale, 0.2);
@@ -251,7 +318,6 @@ class QuickFollowerMenu extends MovieClip
 			case 4:
 				Inventory_Color.setRGB(0xE3E3E3);
 				Inventory_Option.inventory_text.textColor = 0xE3E3E3;
-				//Inventory_Option._alpha = 100;
 				
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 10, 0.3);
 				Tween.LinearTween(Inventory_Option,"_width", Inventory_Option._width, Inventory_Width+scale, 0.2);
@@ -290,6 +356,15 @@ class QuickFollowerMenu extends MovieClip
 			skse.CloseMenu("CustomMenu");
 		});
 		Tween.LinearTween(this,"_alpha", this._alpha, 0, 0.2, onFadeTweenComplete());
+	}
+	
+	function clean(str): String
+	{
+		if (str.charAt(str.length - 1) == ",")
+		{
+			str = str.substring(0,str.length -1);
+		}
+		return str
 	}
 	
 	function resetColor():Void
