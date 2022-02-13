@@ -69,9 +69,9 @@ class QuickFollowerMenu extends MovieClip
 		
 		names_input.onRollOver = function ()
 		{
-			_parent.onInputRectMouseOver(0);
+			_parent.onInputRectMouseOver(-1);
 		}
-
+		
 		StopWaiting_Input.onRollOver = function()
 		{
 			_parent.onInputRectMouseOver(1);
@@ -135,7 +135,7 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Height = Inventory_Option._height;
 		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
 		menuShown = true;
-		//getFollowersFromString("Inigo,924585,Auri,124152,TheLegend27,123541","Inigo,924585");
+		//getFollowersFromString("Inigo,924585,Auri,124152,Inigo,924585,Auri,124152,Inigo,924585,Auri,124152,Inigo,924585,Auri,124152,Inigo,924585,Auri,124152,Inigo,924585,Auri,124152,","");
 	}
 	
 	function getFollowersFromString(followerString: String, followerStringDisabled: String): Void
@@ -180,12 +180,12 @@ class QuickFollowerMenu extends MovieClip
 		for (var i = 0; i < followers.length; i++)
 		{
 			var color;
-			var active = "  "
+			var active = "<FONT FACE=\"$SkyrimSymbolsFont\" SIZE=\"20\">] ]</FONT>"
 			followers[i][1] ? color =  "0xB3B3B3" : color = "#3A3A3A";
 			if (followers[i][3])
 			{
 				followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
-				active = "<FONT FACE=\"$SkyrimSymbolsFont\" SIZE=\"20\"> 6</FONT>"
+				active = "<FONT FACE=\"$SkyrimSymbolsFont\" SIZE=\"20\">]]6</FONT>"
 			}
 			ret = ret + " <FONT FACE=\"$EverywhereBoldFont\" COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+active+"<br>";
 		}
@@ -256,9 +256,10 @@ class QuickFollowerMenu extends MovieClip
 			{
 				handleSelection(currentSelection);
 			}
-			else if (details.navEquivalent == NavigationCode.GAMEPAD_X)
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_L1 || details.code == 16)
 			{
 				followersSelectionIndex = 0;
+				handleHighlight(-1);
 				followers[followersSelectionIndex][3] = true;
 				followerList.FollowerName.htmlText = constructFollowerString();
 			}
@@ -292,15 +293,12 @@ class QuickFollowerMenu extends MovieClip
 			{
 				FollowerCallback(followersSelectionIndex);
 			}
-			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_B || details.navEquivalent == NavigationCode.RIGHT)
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_B || details.navEquivalent == NavigationCode.RIGHT || details.navEquivalent == NavigationCode.TAB || details.navEquivalent == NavigationCode.GAMEPAD_R1 || details.code == 16)
 			{
 				followers[followersSelectionIndex][3] = false;
+				handleHighlight(0);
 				followersSelectionIndex = -1;
 				followerList.FollowerName.htmlText = constructFollowerString();
-			}
-			else if (details.navEquivalent == NavigationCode.TAB)
-			{
-				doClose();
 			}
 		}
 	}
@@ -313,6 +311,8 @@ class QuickFollowerMenu extends MovieClip
 		resetColor();
 		
 		shines_mc._alpha = 0;
+		Tween.LinearTween(followerList.art,"_alpha", followerList.art._alpha, 40, 0.2);
+		
 		GameDelegate.call("HighlightMenu", [aiSelection]);
 		GameDelegate.call("PlaySound",["UISkillsBackward"]);
 		
@@ -328,6 +328,11 @@ class QuickFollowerMenu extends MovieClip
 		var scale: Number = 10;
 		
 		switch(aiSelection){
+			case -1:
+				shines_mc._alpha = 0;
+				Tween.LinearTween(followerList.art,"_alpha", followerList.art._alpha, 70, 0.2);
+				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 0, 0.3);
+				break;
 			case 0:
 				shines_mc._alpha = 0;
 				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 0, 0.3);
@@ -398,6 +403,7 @@ class QuickFollowerMenu extends MovieClip
 	
 	function doClose():Void
 	{
+		skse.SendModEvent("QuickFollowerMenu", "CloseMenuNoChoice");
 		var onFadeTweenComplete:Function = Delegate.create(this, function ()
 		{
 			skse.CloseMenu("CustomMenu");

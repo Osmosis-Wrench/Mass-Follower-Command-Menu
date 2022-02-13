@@ -68,8 +68,6 @@ function showMenu()
 endFunction
 
 int function checkAndSendInfo()
-	qfcCrosshairList.Revert()
-	qfcCrosshairList.AddForm(Game.GetCurrentCrosshairRef())
 	int i = UICallback.create("CustomMenu", "_root.QuickFollowerMenu_mc.getFollowersFromString")
 	UiCallback.PushString(i, getFollowerString(qfcList)) ;as2 doesn't support named arguements, so we have to send all three always.
 	UiCallback.PushString(i, getFollowerString(qfcDisabledList))
@@ -109,6 +107,8 @@ Event MenuEvent(string eventName, string strArg, float numArg, Form sender)
 		doCommand(commandTeleport)
 	elseif strArg == "Inventory"
 		doCommand(commandInventory)
+	elseif strArg == "CloseMenuNoChoice"
+		Game.SetHudCartMode(false)
 	endif
 endEvent
 
