@@ -6,7 +6,6 @@ import Shared.GlobalFunc;
 import Components.Meter;
 import skyui.util.Tween;
 import mx.utils.Delegate;
-import Selection;
 import skse;
 
 class QuickFollowerMenu extends MovieClip
@@ -130,7 +129,7 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Height = Inventory_Option._height;
 		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
 		menuShown = true;
-		//getFollowersFromString("Jenassa,924585,Poop,124152,Butthole,123541","","");
+		getFollowersFromString("TheLegend,924585,Poop,124152,Butthole,123541","","");
 	}
 	
 	function getFollowersFromString(followerString: String, followerStringDisabled: String, fromCrosshairModeTarget: String): Void
@@ -169,9 +168,11 @@ class QuickFollowerMenu extends MovieClip
 				}
 			}
 		}
-		followerList.FollowerName.htmlText = constructFollowerString();
-		Tween.LinearTween(followerList,"_alpha", followerList._alpha, 100, 0.3);
-		followersShown = true;
+		if (followerString != ""){
+			followerList.FollowerName.htmlText = constructFollowerString();
+			Tween.LinearTween(followerList,"_alpha", followerList._alpha, 100, 0.3);
+			followersShown = true;
+		}
 	}
 	
 	function addFollower(followerName:String, followerEnabled:Boolean, followerFormId:String)
@@ -182,7 +183,7 @@ class QuickFollowerMenu extends MovieClip
 	
 	function constructFollowerString(): String
 	{
-		var ret: String = "|";
+		var ret: String = "";
 		for (var i = 0; i < followers.length; i++)
 		{
 			var color;
@@ -191,8 +192,9 @@ class QuickFollowerMenu extends MovieClip
 			{
 				followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
 			}
-			ret = ret + "  <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+"  |";
+			ret = ret + " <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+" |";
 		}
+		ret = ret.substring(0,ret.length -1);
 		return ret;
 	}
 	
