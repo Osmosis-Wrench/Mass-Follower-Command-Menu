@@ -6,6 +6,7 @@ import Shared.GlobalFunc;
 import Components.Meter;
 import skyui.util.Tween;
 import mx.utils.Delegate;
+import Selection;
 import skse;
 
 class QuickFollowerMenu extends MovieClip
@@ -46,9 +47,10 @@ class QuickFollowerMenu extends MovieClip
 	
 	var followerList:MovieClip;
 	var followers: Array = new Array();
+	var followersSelectionIndex:Number = -1;
 	var crosshairMode: Boolean = false;
+	var followersShown: Boolean = false;
 	var menuShown: Boolean = false;
-
 
 	function QuickFollowerMenu()
 	{
@@ -67,6 +69,7 @@ class QuickFollowerMenu extends MovieClip
 		StopWaiting_Input.onRollOver = function()
 		{
 			_parent.onInputRectMouseOver(1);
+			_parent.test();
 		};
 		StopWaiting_Input.onMouseDown = function()
 		{
@@ -113,11 +116,10 @@ class QuickFollowerMenu extends MovieClip
 		};
 	}
 	
-
-	
 	function onLoad():Void
 	{
 		this._alpha = 0;
+		followerList._alpha = 0;
 		StopWaiting_Width = StopWaiting_Option._width;
 		StopWaiting_Height = StopWaiting_Option._height;
 		Wait_Width = Wait_Option._width;
@@ -126,8 +128,9 @@ class QuickFollowerMenu extends MovieClip
 		Teleport_Height = Teleport_Option._height;
 		Inventory_Width = Inventory_Option._width;
 		Inventory_Height = Inventory_Option._height;
-		//getFollowersFromString("Jenassa,924585,","","");
-		trace(crosshairMode);
+		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
+		menuShown = true;
+		//getFollowersFromString("Jenassa,924585,Poop,124152,Butthole,123541","","");
 	}
 	
 	function getFollowersFromString(followerString: String, followerStringDisabled: String, fromCrosshairModeTarget: String): Void
@@ -153,6 +156,7 @@ class QuickFollowerMenu extends MovieClip
 			}
 		}
 		if (fromCrosshairModeTarget != ""){
+			fromCrosshairModeTarget = clean(fromCrosshairModeTarget);
 			crosshairMode = true;
 			parse = fromCrosshairModeTarget.split(",");
 			for (var i = 0; i < followers.length; i++)
@@ -166,13 +170,13 @@ class QuickFollowerMenu extends MovieClip
 			}
 		}
 		followerList.FollowerName.htmlText = constructFollowerString();
-		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
-		menuShown = true;
+		Tween.LinearTween(followerList,"_alpha", followerList._alpha, 100, 0.3);
+		followersShown = true;
 	}
 	
 	function addFollower(followerName:String, followerEnabled:Boolean, followerFormId:String)
 	{
-		var newFollower = [followerName, followerEnabled, followerFormId];
+		var newFollower = [followerName, followerEnabled, followerFormId, false];
 		followers.push(newFollower);
 	}
 	
@@ -182,9 +186,12 @@ class QuickFollowerMenu extends MovieClip
 		for (var i = 0; i < followers.length; i++)
 		{
 			var color;
-			//followers[i][1] ? color =  "0xB3B3B3" : color = "#E3E3E3";
-			followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
-			ret = ret + "  <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+" "+followers[i][1]+"</A>"+"</FONT>"+"  |";
+			followers[i][1] ? color =  "0xB3B3B3" : color = "#3A3A3A";
+			if (followers[i][3])
+			{
+				followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
+			}
+			ret = ret + "  <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+"  |";
 		}
 		return ret;
 	}
@@ -218,7 +225,7 @@ class QuickFollowerMenu extends MovieClip
 	
 	function handleInput(details: InputDetails, pathToFocus: Array): Void
 	{
-		if (GlobalFunc.IsKeyPressed(details) && menuShown){
+		if (GlobalFunc.IsKeyPressed(details) && menuShown && followersSelectionIndex == -1){
 			if (details.navEquivalent == NavigationCode.UP)
 			{
 				if (currentSelection == 1){
@@ -255,7 +262,49 @@ class QuickFollowerMenu extends MovieClip
 			{
 				handleSelection(currentSelection);
 			}
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_X)
+			{
+				followersSelectionIndex = 0;
+				followers[followersSelectionIndex][3] = true;
+				followerList.FollowerName.htmlText = constructFollowerString();
+			}
 			else if (details.navEquivalent == NavigationCode.GAMEPAD_B || details.navEquivalent == NavigationCode.TAB || details.navEquivalent == NavigationCode.GAMEPAD_BACK)
+			{
+				doClose();
+			}
+		} else if (GlobalFunc.IsKeyPressed(details) && menuShown && followersShown && followersSelectionIndex != -1){
+			if (details.navEquivalent == NavigationCode.LEFT)
+			{
+				followers[followersSelectionIndex][3] = false;
+				followersSelectionIndex = followersSelectionIndex - 1;;
+				if (followersSelectionIndex <= -1){
+						var len = followers.length;
+						followersSelectionIndex = len - 1;
+				}
+				followers[followersSelectionIndex][3] = true;
+				followerList.FollowerName.htmlText = constructFollowerString();
+			}
+			else if (details.navEquivalent == NavigationCode.RIGHT)
+			{
+				followers[followersSelectionIndex][3] = false;
+				followersSelectionIndex = followersSelectionIndex + 1;
+				if (followersSelectionIndex >= followers.length){
+						followersSelectionIndex = 0;
+				}
+				followers[followersSelectionIndex][3] = true;
+				followerList.FollowerName.htmlText = constructFollowerString();
+			}
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_A)
+			{
+				FollowerCallback(followersSelectionIndex);
+			}
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_B)
+			{
+				followers[followersSelectionIndex][3] = false;
+				followersSelectionIndex = -1;
+				followerList.FollowerName.htmlText = constructFollowerString();
+			}
+			else if (details.navEquivalent == NavigationCode.TAB || details.navEquivalent == NavigationCode.GAMEPAD_BACK)
 			{
 				doClose();
 			}
