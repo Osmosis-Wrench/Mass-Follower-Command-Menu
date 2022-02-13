@@ -10,7 +10,8 @@ import skse;
 
 class QuickFollowerMenu extends MovieClip
 {
-    var StopWaiting_Input:MovieClip;
+    var names_input:MovieClip;
+	var StopWaiting_Input:MovieClip;
     var StopWaiting_Option:MovieClip;
 	var stopwaiting_icon:MovieClip;
 	var StopWaiting_Width: Number;
@@ -47,7 +48,6 @@ class QuickFollowerMenu extends MovieClip
 	var followerList:MovieClip;
 	var followers: Array = new Array();
 	var followersSelectionIndex:Number = -1;
-	var crosshairMode: Boolean = false;
 	var followersShown: Boolean = false;
 	var menuShown: Boolean = false;
 
@@ -62,13 +62,19 @@ class QuickFollowerMenu extends MovieClip
 		Wait_Color = new Color(Wait_Option.wait_icon);
 		Teleport_Color = new Color(Teleport_Option.teleport_icon);
 		Inventory_Color = new Color(Inventory_Option.inventory_icon);
+		followerList.FollowerName.autoSize = "left";
+		trace(followerList.FollowerName._height);
 		
 		resetColor();
+		
+		names_input.onRollOver = function ()
+		{
+			_parent.onInputRectMouseOver(0);
+		}
 
 		StopWaiting_Input.onRollOver = function()
 		{
 			_parent.onInputRectMouseOver(1);
-			_parent.test();
 		};
 		StopWaiting_Input.onMouseDown = function()
 		{
@@ -129,10 +135,10 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Height = Inventory_Option._height;
 		Tween.LinearTween(this,"_alpha", this._alpha, 100, 0.3);
 		menuShown = true;
-		getFollowersFromString("TheLegend,924585,Poop,124152,Butthole,123541","","");
+		//getFollowersFromString("Inigo,924585,Auri,124152,TheLegend27,123541","Inigo,924585");
 	}
 	
-	function getFollowersFromString(followerString: String, followerStringDisabled: String, fromCrosshairModeTarget: String): Void
+	function getFollowersFromString(followerString: String, followerStringDisabled: String): Void
 	{
 		followerString = clean(followerString);
 		var parse = followerString.split(",");
@@ -154,22 +160,9 @@ class QuickFollowerMenu extends MovieClip
 				}
 			}
 		}
-		if (fromCrosshairModeTarget != ""){
-			fromCrosshairModeTarget = clean(fromCrosshairModeTarget);
-			crosshairMode = true;
-			parse = fromCrosshairModeTarget.split(",");
-			for (var i = 0; i < followers.length; i++)
-			{
-				if (followers[i][2] != parse[1])
-				{
-					followers[i][1] = false;
-				} else {
-					followers[i][1] = true;
-				}
-			}
-		}
 		if (followerString != ""){
 			followerList.FollowerName.htmlText = constructFollowerString();
+			followerList.FollowerName._y -= (followerList.FollowerName._height / 2);
 			Tween.LinearTween(followerList,"_alpha", followerList._alpha, 100, 0.3);
 			followersShown = true;
 		}
@@ -187,14 +180,16 @@ class QuickFollowerMenu extends MovieClip
 		for (var i = 0; i < followers.length; i++)
 		{
 			var color;
+			var active = "  "
 			followers[i][1] ? color =  "0xB3B3B3" : color = "#3A3A3A";
 			if (followers[i][3])
 			{
 				followers[i][1] ? color =  "#00ff13" : color = "#ff2d00";
+				active = "<FONT FACE=\"$SkyrimSymbolsFont\" SIZE=\"20\"> 6</FONT>"
 			}
-			ret = ret + " <FONT COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+" |";
+			ret = ret + " <FONT FACE=\"$EverywhereBoldFont\" COLOR=\""+color+"\">"+"<A HREF=\"asfunction:_parent.FollowerCallback,"+i+"\">"+followers[i][0]+"</A>"+"</FONT>"+active+"<br>";
 		}
-		ret = ret.substring(0,ret.length -1);
+		ret = ret.substring(0,ret.length -4);
 		return ret;
 	}
 	
@@ -202,14 +197,11 @@ class QuickFollowerMenu extends MovieClip
 	{
 		followers[arg][1] = !followers[arg][1];
 		trace("You clicked on follower "+followers[arg][0]+" toggling them to "+followers[arg][1]);
-		var m = "normal"
-		if (crosshairMode) { m = "crosshair"; }
-		trace(m);
 		if (followers[arg][1]){
-			skse.SendModEvent("QuickFollowerMenu_Toggle",m,1,parseInt(followers[arg][2]));
+			skse.SendModEvent("QuickFollowerMenu_Toggle","false to true",1,parseInt(followers[arg][2]));
 		}
 		else {
-			skse.SendModEvent("QuickFollowerMenu_Toggle",m,0,parseInt(followers[arg][2]));
+			skse.SendModEvent("QuickFollowerMenu_Toggle","true to false",0,parseInt(followers[arg][2]));
 		}
 		
 		followerList.FollowerName.htmlText = constructFollowerString();
@@ -275,7 +267,7 @@ class QuickFollowerMenu extends MovieClip
 				doClose();
 			}
 		} else if (GlobalFunc.IsKeyPressed(details) && menuShown && followersShown && followersSelectionIndex != -1){
-			if (details.navEquivalent == NavigationCode.LEFT)
+			if (details.navEquivalent == NavigationCode.UP)
 			{
 				followers[followersSelectionIndex][3] = false;
 				followersSelectionIndex = followersSelectionIndex - 1;;
@@ -286,7 +278,7 @@ class QuickFollowerMenu extends MovieClip
 				followers[followersSelectionIndex][3] = true;
 				followerList.FollowerName.htmlText = constructFollowerString();
 			}
-			else if (details.navEquivalent == NavigationCode.RIGHT)
+			else if (details.navEquivalent == NavigationCode.DOWN)
 			{
 				followers[followersSelectionIndex][3] = false;
 				followersSelectionIndex = followersSelectionIndex + 1;
@@ -300,13 +292,13 @@ class QuickFollowerMenu extends MovieClip
 			{
 				FollowerCallback(followersSelectionIndex);
 			}
-			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_B)
+			else if (details.navEquivalent == NavigationCode.GAMEPAD_X || details.navEquivalent == NavigationCode.GAMEPAD_B || details.navEquivalent == NavigationCode.RIGHT)
 			{
 				followers[followersSelectionIndex][3] = false;
 				followersSelectionIndex = -1;
 				followerList.FollowerName.htmlText = constructFollowerString();
 			}
-			else if (details.navEquivalent == NavigationCode.TAB || details.navEquivalent == NavigationCode.GAMEPAD_BACK)
+			else if (details.navEquivalent == NavigationCode.TAB)
 			{
 				doClose();
 			}
@@ -336,6 +328,10 @@ class QuickFollowerMenu extends MovieClip
 		var scale: Number = 10;
 		
 		switch(aiSelection){
+			case 0:
+				shines_mc._alpha = 0;
+				Tween.LinearTween(shines_mc,"_alpha", shines_mc._alpha, 0, 0.3);
+				break;
 			case 1:
 				StopWaiting_Color.setRGB(0xE3E3E3);
 				StopWaiting_Option.stopwaiting_text.textColor = 0xE3E3E3;

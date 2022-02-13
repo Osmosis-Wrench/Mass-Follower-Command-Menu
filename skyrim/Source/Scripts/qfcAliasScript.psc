@@ -6,7 +6,6 @@ string property waitingText auto
 string property stopWaitingText auto
 formList property qfcList Auto
 formlist property qfcDisabledList auto
-formlist property qfcCrosshairList auto
 faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
@@ -46,96 +45,83 @@ state busy
 	event OnKeyDown(int keyCode)
 	endEvent
 
-	Function doCommand(int command)
+	function showMenu()
 	endFunction
 endState
 
 event OnKeyDown(int keyCode)
 	if keyCode == hotkey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Crafting Menu") && !UI.IsMenuOpen("RaceSex Menu") && !UI.IsMenuOpen("CustomMenu")
-		ui.OpenCustomMenu("mfc_menu")
-		int i = checkAndSendInfo()
-		UICallback.Send(i)
+		showMenu()
 	endIf
 endEvent
+
+function showMenu()
+	GotoState("busy")
+	ui.OpenCustomMenu("mfc_menu")
+	Game.SetHudCartMode(true)
+	int i = checkAndSendInfo()
+	UICallback.Send(i)
+	while(Utility.IsInMenuMode())
+		Utility.Wait(0.1)
+	endWhile
+	GotoState("")
+endFunction
 
 int function checkAndSendInfo()
 	qfcCrosshairList.Revert()
 	qfcCrosshairList.AddForm(Game.GetCurrentCrosshairRef())
 	int i = UICallback.create("CustomMenu", "_root.QuickFollowerMenu_mc.getFollowersFromString")
-		UiCallback.PushString(i, getFollowerString(qfcList)) ;as2 doesn't support named arguements, so we have to send all three always.
-		UiCallback.PushString(i, getFollowerString(qfcDisabledList))
-		UiCallback.PushString(i, getFollowerString(qfcCrosshairList))
+	UiCallback.PushString(i, getFollowerString(qfcList)) ;as2 doesn't support named arguements, so we have to send all three always.
+	UiCallback.PushString(i, getFollowerString(qfcDisabledList))
 	return i
 endFunction
 
 string function getFollowerString(formlist f)
 	string ret = ""
-	int n = f.GetSize()
+	Form[] arr = f.ToArray()
+	int n = arr.Length
 	while n
 		n -= 1
-		Actor follower = f.GetAt(n) as Actor
+		Actor follower = arr[n] as Actor
 		if IsFollower(follower)
 			ret += follower.GetDisplayName()+","+follower.getFormID()+","
+		else
+			f.RemoveAddedForm(follower)
 		endIf
 	endWhile
 	return ret
 endfunction
 
 Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
-	if strArg == "normal"
-		if numArg == 0
-			qfcDisabledList.AddForm(sender)
-		else
-			qfcDisabledList.RemoveAddedForm(sender)
-		endif
+	if numArg == 0
+		qfcDisabledList.AddForm(sender)
 	else
-		if numArg == 0
-			qfcCrosshairList.AddForm(sender)
-		else
-			qfcCrosshairList.RemoveAddedForm(sender)
-		endif
+		qfcDisabledList.RemoveAddedForm(sender)
 	endif
 endEvent
 
 Event MenuEvent(string eventName, string strArg, float numArg, Form sender)
 	if strArg == "StopWaiting"
 		doCommand(commandFollow)
-    elseif strArg == "StartWaiting"
+	elseif strArg == "StartWaiting"
 		doCommand(commandWait)
-    elseif strArg == "Teleport"
+	elseif strArg == "Teleport"
 		doCommand(commandTeleport)
-    elseif strArg == "Inventory"
+	elseif strArg == "Inventory"
 		doCommand(commandInventory)
-    endif
+	endif
 endEvent
 
 Function doCommand(int command)
-	GotoState("busy")
-	
-	formlist f
-	if (qfcCrosshairList.GetSize() > 0)
-		f = qfcCrosshairList
-		int n = f.GetSize()
-		while n
-			n -= 1
-			Actor follower = f.GetAt(n) as Actor
-			if IsFollower(follower)
-				doFollower(command, follower)
-			endIf
-		endWhile
-	else
-		f = qfcList
-		int n = f.GetSize()
-		while n
-			n -= 1
-			Actor follower = f.GetAt(n) as Actor
-			if IsFollower(follower) && qfcDisabledList.find(follower) == -1
-				doFollower(command, follower)
-			endIf
-		endWhile
-	endif
-	
-	GotoState("")
+	Game.SetHudCartMode(false)
+	int n = qfcList.GetSize()
+	while n
+		n -= 1
+		Actor follower = qfcList.GetAt(n) as Actor
+		if IsFollower(follower) && !qfcDisabledList.HasForm(follower)
+			doFollower(command, follower)
+		endIf
+	endWhile
 endFunction
 
 function doFollower(int command, Actor follower)
