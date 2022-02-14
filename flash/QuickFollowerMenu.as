@@ -152,10 +152,8 @@ class QuickFollowerMenu extends MovieClip
 		Teleport_Height = Teleport_Option._height;
 		Inventory_Width = Inventory_Option._width;
 		Inventory_Height = Inventory_Option._height;
-		Tween.LinearTween(followerList,"_alpha",followerList._alpha,100,0.3);
+		Tween.LinearTween(this,"_alpha",this._alpha,100,0.3);
 		menuShown = true;
-		//getFollowersFromString("Inigo,924585,Auri,124152,Butthole,924585,TiddyFollower#340,1235632,","Auri,124152");
-		//getFollowersFromString("Inigo,924585,Butthole,1234","");
 	}
 
 	function getFollowersFromString(followerString:String, followerStringDisabled:String):Void
@@ -183,7 +181,7 @@ class QuickFollowerMenu extends MovieClip
 		}
 		if (followerString != "")
 		{
-			Tween.LinearTween(this,"_alpha",this._alpha,100,0.3);
+			Tween.LinearTween(followerList,"_alpha",followerList._alpha,100,0.3);
 			buildFollowersSection();
 		}
 	};
