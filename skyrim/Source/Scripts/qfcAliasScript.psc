@@ -9,12 +9,6 @@ formlist property qfcDisabledList auto
 faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
-int commandFollow
-int commandWait
-int commandInventory
-int commandCommand
-int commandTeleport
-int commandDismiss
 
 event OnPlayerLoadGame()
 	SetUp()
@@ -34,11 +28,6 @@ function SetUp()
 	RegisterForKey(hotkey)
 	RegisterForModEvent("QuickFollowerMenu", "MenuEvent")
 	RegisterForModEvent("QuickFollowerMenu_Toggle", "ToggleEvent")
-
-	commandWait = 0
-	commandFollow = 1
-	commandInventory = 2
-	commandTeleport = 3
 endFunction
 
 state busy
@@ -99,20 +88,14 @@ Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
 endEvent
 
 Event MenuEvent(string eventName, string strArg, float numArg, Form sender)
-	if strArg == "StopWaiting"
-		doCommand(commandFollow)
-	elseif strArg == "StartWaiting"
-		doCommand(commandWait)
-	elseif strArg == "Teleport"
-		doCommand(commandTeleport)
-	elseif strArg == "Inventory"
-		doCommand(commandInventory)
-	elseif strArg == "CloseMenuNoChoice"
+	if strArg == "CloseMenuNoChoice"
 		Game.SetHudCartMode(false)
+	else
+		doCommand(strArg)
 	endif
 endEvent
 
-Function doCommand(int command)
+Function doCommand(string command)
 	Game.SetHudCartMode(false)
 	int n = qfcList.GetSize()
 	while n
@@ -124,14 +107,14 @@ Function doCommand(int command)
 	endWhile
 endFunction
 
-function doFollower(int command, Actor follower)
-	if command == commandWait
+function doFollower(string command, Actor follower)
+	if command == "StartWaiting"
 		WaitActor(follower)
-	elseIf command == commandFollow 
+	elseIf command == "StopWaiting"
 		StopWaitingActor(follower)
-	elseIf command == commandInventory 
+	elseIf command == "Inventory" 
 		OpenInventoryActor(follower)
-	elseIf command == commandTeleport
+	elseIf command == "Teleport"
 		follower.MoveTo(playerRef)
 	endIf
 endFunction
