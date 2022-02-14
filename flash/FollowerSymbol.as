@@ -99,6 +99,7 @@ class FollowerSymbol extends MovieClip
 	
 	function doHoverEffect(isHovered: Boolean): Void
 	{
+		_parent._parent.onInputRectMouseOver(-1);
 		if (f_name){
 			if (isHovered){
 				selector._alpha = 100;

@@ -81,16 +81,7 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Color = new Color(Inventory_Option.inventory_icon);
 
 		resetColor();
-		
-		followerList.onRollOver = function()
-		{
-			_parent.onInputRectMouseOver(-1);
-		}
 
-		names_input.onRollOver = function()
-		{
-			_parent.onInputRectMouseOver(-1);
-		};
 		StopWaiting_Input.onRollOver = function()
 		{
 			_parent.onInputRectMouseOver(1);
