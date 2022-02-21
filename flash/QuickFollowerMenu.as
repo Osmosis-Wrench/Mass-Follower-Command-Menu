@@ -52,13 +52,12 @@ class QuickFollowerMenu extends MovieClip
 	var followersShown:Boolean = false;
 	var menuShown:Boolean = false;
 	var buttonHeldTime:Number;
-
-	//var test1:TextField;
-
+	var bg: MovieClip;
+	var tNote: MovieClip;
+	
 	function QuickFollowerMenu()
 	{
 		super();
-
 		followersSymbols.push(followerList.follower0);
 		followersSymbols.push(followerList.follower1);
 		followersSymbols.push(followerList.follower2);
@@ -81,6 +80,17 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Color = new Color(Inventory_Option.inventory_icon);
 
 		resetColor();
+		
+		tNote.translatorName.autoSize = "left";
+		tNote.translatorName.text = "Translation by: Luca|EzioTheDeadPoet";
+		tNote.onRollOver = function()
+		{
+			_parent.tNote.gotoAndPlay(1);
+		}
+		tNote.onRollOut = function()
+		{
+			_parent.tNote.gotoAndStop(1);
+		}
 
 		StopWaiting_Input.onRollOver = function()
 		{
@@ -133,6 +143,16 @@ class QuickFollowerMenu extends MovieClip
 
 	function onLoad():Void
 	{
+		var stageObj = new Object();
+		Stage.addListener(stageObj);
+		stageObj.onResize = function()
+		{
+			_root.QuickFollowerMenu_mc.bg._width = Stage.width;
+			_root.QuickFollowerMenu_mc.bg._height = Stage.height;
+		};
+		stageObj.onResize();
+		Stage.addListener(stageObj);
+		
 		this._alpha = 0;
 		followerList._alpha = 0;
 		StopWaiting_Width = StopWaiting_Option._width;
@@ -144,6 +164,7 @@ class QuickFollowerMenu extends MovieClip
 		Inventory_Width = Inventory_Option._width;
 		Inventory_Height = Inventory_Option._height;
 		Tween.LinearTween(this,"_alpha",this._alpha,100,0.3);
+		//getFollowersFromString("au1ri,12343,lucien,6432314","");
 		menuShown = true;
 	}
 
