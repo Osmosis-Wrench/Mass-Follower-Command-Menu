@@ -81,15 +81,15 @@ class QuickFollowerMenu extends MovieClip
 
 		resetColor();
 		
-		tNote.translatorName.autoSize = "left";
-		tNote.translatorName.text = "Translation by: Luca|EzioTheDeadPoet";
-		tNote.onRollOver = function()
+		tNote.translatorName.translatorNameText.autoSize = "left";
+		_parent.tNote.translatorName._alpha = 100;
+		tNote.hereForMouseOverOnly.onRollOver = function()
 		{
-			_parent.tNote.gotoAndPlay(1);
+			_parent.translatorName._alpha = 100;
 		}
-		tNote.onRollOut = function()
+		tNote.hereForMouseOverOnly.onRollOut = function()
 		{
-			_parent.tNote.gotoAndStop(1);
+			_parent.translatorName._alpha = 0;
 		}
 
 		StopWaiting_Input.onRollOver = function()
