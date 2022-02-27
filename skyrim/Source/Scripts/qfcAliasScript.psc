@@ -81,13 +81,11 @@ string function getFollowerString(formlist f)
 endfunction
 
 event RemoveEvent(string eventName, string strArg, float numArg, Form sender)
-	consoleUtil.PrintMessage(eventName +" "+strArg+" "+ numArg+" "+ sender)
     qfcList.RemoveAddedForm(sender)
     qfcDisabledList.RemoveAddedForm(sender)
 endEvent
 
 Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
-	consoleUtil.PrintMessage(eventName +" "+strArg+" "+ numArg+" "+ sender)
 	if numArg == 0
 		qfcDisabledList.AddForm(sender)
 	else
@@ -96,7 +94,6 @@ Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
 endEvent
 
 Event MenuEvent(string eventName, string strArg, float numArg, Form sender)
-	consoleUtil.PrintMessage(eventName +" "+strArg+" "+ numArg+" "+ sender)
 	if strArg == "CloseMenuNoChoice"
 		Game.SetHudCartMode(false)
 	else
