@@ -9,7 +9,7 @@
     <Variables>
         <Variable Name="ModName" Value="Swiftly Order Squad"/>
         <Variable Name="MyProject" Value="."/>
-        <Variable Name="Ver" Value="1.3"/>
+        <Variable Name="Ver" Value="1.4"/>
         <Variable Name="Dist" Value="../bin"/>
     </Variables>
     <Imports>
@@ -25,6 +25,9 @@
     <ZipFiles Output="@Dist">
         <ZipFile Name="@ModName @Ver" RootDir="@MyProject" Compression="deflate">
              <Match>*.pex|*.psc|*.esp|*.swf|*.txt|*.json|*.ini</Match>
+        </ZipFile>
+        <ZipFile Name="@ModName @Ver - Old Icons Patch" RootDir="../old_assets" Compression="deflate">
+             <Match>*.swf</Match>
         </ZipFile>
     </ZipFiles>
 </PapyrusProject>
