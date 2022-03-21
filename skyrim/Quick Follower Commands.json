@@ -2,6 +2,9 @@
 	"int" : 
 	{
 		"dxcode" : 40,
-		"showSpell": 0
+		"qfc_follow" : -1,
+		"qfc_wait" : -1,
+		"qfc_inventory" : -1,
+		"qfc_teleport" : -1
 	}
 }

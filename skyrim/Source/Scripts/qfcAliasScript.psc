@@ -9,6 +9,10 @@ formlist property qfcDisabledList auto
 faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
+int stopWaitingHotkey
+int startWaitingHotkey
+int inventoryHotkey
+int teleportHotkey
 
 event OnPlayerLoadGame()
 	SetUp()
@@ -19,17 +23,31 @@ event OnInit()
 endEvent
 
 function SetUp()
-	UnregisterForAllKeys()
-	string fileName = "../../../Quick Follower Commands.json"
-	hotkey = JsonUtil.GetIntValue(fileName, "dxcode", -1)
-	if hotkey < 0
-		return
-	endIf
-	RegisterForKey(hotkey)
+	RegisterForModEvent("QuickFollowerMenu_hotkeyRebind", "hotkeyRebind")
+
+	hotkeyRebind()
+	
 	RegisterForModEvent("QuickFollowerMenu", "MenuEvent")
 	RegisterForModEvent("QuickFollowerMenu_Toggle", "ToggleEvent")
 	RegisterForModEvent("QuickFollowerMenu_Delete", "RemoveEvent")
 endFunction
+
+event hotkeyRebind(string eventName, string strArg, float numArg, Form sender)
+	string fileName = "../../../Quick Follower Commands.json"
+	unregisterForAllKeys()
+
+	hotkey = JsonUtil.GetIntValue(fileName, "dxcode", -1)
+	followHotkey = JsonUtil.GetIntValue(fileName, "qfc_follow", -1)
+    waitHotkey = JsonUtil.GetIntValue(fileName, "qfc_wait", -1)
+    inventoryHotkey = JsonUtil.GetIntValue(fileName, "qfc_inventory", -1)
+    teleportHotkey = JsonUtil.GetIntValue(fileName, "qfc_teleport", -1)
+
+	RegisterForKey(hotkey)
+	registerforkey(followHotkey)
+    registerforkey(waitHotkey)
+    registerforkey(inventoryHotkey)
+    registerforkey(teleportHotkey)
+endEvent
 
 state busy
 	event OnKeyDown(int keyCode)
@@ -40,9 +58,19 @@ state busy
 endState
 
 event OnKeyDown(int keyCode)
-	if keyCode == hotkey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Crafting Menu") && !UI.IsMenuOpen("RaceSex Menu") && !UI.IsMenuOpen("CustomMenu")
-		showMenu()
-	endIf
+	if !Utility.IsInMenuMode() && !UI.IsMenuOpen("Crafting Menu") && !UI.IsMenuOpen("RaceSex Menu") && !UI.IsMenuOpen("CustomMenu")
+		if keyCode == hotkey
+			showMenu()
+		elseif keyCode == stopWaitingHotkey
+			doCommand("StopWaiting")
+		elseif keyCode == startWaitingHotkey
+			doCommand("StartWaiting")
+		elseif keyCode == inventoryHotkey
+			doCommand("Inventory")
+		elseif keyCode == teleportHotkey
+			doCommand("Teleport")
+		endIf
+	endif
 endEvent
 
 function showMenu()
