@@ -4,8 +4,9 @@ message property qfcMessage auto
 actor property playerRef auto
 string property waitingText auto
 string property stopWaitingText auto
-formList property qfcList Auto
-formlist property qfcDisabledList auto
+FormList property qfcList Auto
+FormList property qfcDisabledList auto
+FormList property qfcBlockList auto
 faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
@@ -23,31 +24,28 @@ event OnInit()
 endEvent
 
 function SetUp()
-	RegisterForModEvent("QuickFollowerMenu_hotkeyRebind", "hotkeyRebind")
-
 	hotkeyRebind()
-	
 	RegisterForModEvent("QuickFollowerMenu", "MenuEvent")
 	RegisterForModEvent("QuickFollowerMenu_Toggle", "ToggleEvent")
 	RegisterForModEvent("QuickFollowerMenu_Delete", "RemoveEvent")
 endFunction
 
-event hotkeyRebind(string eventName, string strArg, float numArg, Form sender)
+function hotkeyRebind()
 	string fileName = "../../../Quick Follower Commands.json"
 	unregisterForAllKeys()
 
 	hotkey = JsonUtil.GetIntValue(fileName, "dxcode", -1)
-	followHotkey = JsonUtil.GetIntValue(fileName, "qfc_follow", -1)
-    waitHotkey = JsonUtil.GetIntValue(fileName, "qfc_wait", -1)
+	stopWaitingHotkey = JsonUtil.GetIntValue(fileName, "qfc_stopWaiting", -1)
+    startWaitingHotkey = JsonUtil.GetIntValue(fileName, "qfc_startWaiting", -1)
     inventoryHotkey = JsonUtil.GetIntValue(fileName, "qfc_inventory", -1)
     teleportHotkey = JsonUtil.GetIntValue(fileName, "qfc_teleport", -1)
 
 	RegisterForKey(hotkey)
-	registerforkey(followHotkey)
-    registerforkey(waitHotkey)
+	registerforkey(stopWaitingHotkey)
+    registerforkey(startWaitingHotkey)
     registerforkey(inventoryHotkey)
     registerforkey(teleportHotkey)
-endEvent
+endfunction
 
 state busy
 	event OnKeyDown(int keyCode)
@@ -111,6 +109,7 @@ endfunction
 event RemoveEvent(string eventName, string strArg, float numArg, Form sender)
     qfcList.RemoveAddedForm(sender)
     qfcDisabledList.RemoveAddedForm(sender)
+	qfcBlockList.AddForm(sender)
 endEvent
 
 Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
