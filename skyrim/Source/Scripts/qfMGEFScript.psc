@@ -4,7 +4,7 @@ FormList Property qfcList Auto
 FormList Property qfcBlockList Auto
 
 Event OnEffectStart(Actor akTarget, Actor akCaster)
-	if (!qfcBlockLIst.HasForm(akTarget))
+	if (!qfcBlockList.HasForm(akTarget))
 		qfcList.AddForm(akTarget)
 	endif
 EndEvent
