@@ -4,11 +4,16 @@ message property qfcMessage auto
 actor property playerRef auto
 string property waitingText auto
 string property stopWaitingText auto
-formList property qfcList Auto
-formlist property qfcDisabledList auto
+FormList property qfcList Auto
+FormList property qfcDisabledList auto
+FormList property qfcBlockList auto
 faction property PetFramework_PetFollowingFaction auto
 
 int hotkey
+int stopWaitingHotkey
+int startWaitingHotkey
+int inventoryHotkey
+int teleportHotkey
 
 event OnPlayerLoadGame()
 	SetUp()
@@ -19,17 +24,28 @@ event OnInit()
 endEvent
 
 function SetUp()
-	UnregisterForAllKeys()
-	string fileName = "../../../Quick Follower Commands.json"
-	hotkey = JsonUtil.GetIntValue(fileName, "dxcode", -1)
-	if hotkey < 0
-		return
-	endIf
-	RegisterForKey(hotkey)
+	hotkeyRebind()
 	RegisterForModEvent("QuickFollowerMenu", "MenuEvent")
 	RegisterForModEvent("QuickFollowerMenu_Toggle", "ToggleEvent")
 	RegisterForModEvent("QuickFollowerMenu_Delete", "RemoveEvent")
 endFunction
+
+function hotkeyRebind()
+	string fileName = "../../../Quick Follower Commands.json"
+	unregisterForAllKeys()
+
+	hotkey = JsonUtil.GetIntValue(fileName, "dxcode", -1)
+	stopWaitingHotkey = JsonUtil.GetIntValue(fileName, "qfc_stopWaiting", -1)
+    startWaitingHotkey = JsonUtil.GetIntValue(fileName, "qfc_startWaiting", -1)
+    inventoryHotkey = JsonUtil.GetIntValue(fileName, "qfc_inventory", -1)
+    teleportHotkey = JsonUtil.GetIntValue(fileName, "qfc_teleport", -1)
+
+	RegisterForKey(hotkey)
+	registerforkey(stopWaitingHotkey)
+    registerforkey(startWaitingHotkey)
+    registerforkey(inventoryHotkey)
+    registerforkey(teleportHotkey)
+endfunction
 
 state busy
 	event OnKeyDown(int keyCode)
@@ -40,9 +56,19 @@ state busy
 endState
 
 event OnKeyDown(int keyCode)
-	if keyCode == hotkey && !Utility.IsInMenuMode() && !UI.IsMenuOpen("Crafting Menu") && !UI.IsMenuOpen("RaceSex Menu") && !UI.IsMenuOpen("CustomMenu")
-		showMenu()
-	endIf
+	if !Utility.IsInMenuMode() && !UI.IsMenuOpen("Crafting Menu") && !UI.IsMenuOpen("RaceSex Menu") && !UI.IsMenuOpen("CustomMenu")
+		if keyCode == hotkey
+			showMenu()
+		elseif keyCode == stopWaitingHotkey
+			doCommand("StopWaiting")
+		elseif keyCode == startWaitingHotkey
+			doCommand("StartWaiting")
+		elseif keyCode == inventoryHotkey
+			doCommand("Inventory")
+		elseif keyCode == teleportHotkey
+			doCommand("Teleport")
+		endIf
+	endif
 endEvent
 
 function showMenu()
@@ -83,6 +109,7 @@ endfunction
 event RemoveEvent(string eventName, string strArg, float numArg, Form sender)
     qfcList.RemoveAddedForm(sender)
     qfcDisabledList.RemoveAddedForm(sender)
+	qfcBlockList.AddForm(sender)
 endEvent
 
 Event ToggleEvent(string eventName, string strArg, float numArg, Form sender)
