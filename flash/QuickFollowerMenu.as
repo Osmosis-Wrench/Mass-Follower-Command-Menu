@@ -200,6 +200,7 @@ class QuickFollowerMenu extends MovieClip
 
 	function addFollower(followerName:String, followerEnabled:Boolean, followerFormId:String)
 	{
+		followerName = followerName.charAt(0).toUpperCase() + followerName.substring(1, followerName.length);
 		var newFollower = [followerName, followerEnabled, followerFormId, false];
 		followers.push(newFollower);
 	}

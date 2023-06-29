@@ -160,19 +160,29 @@ function OpenInventoryActor(actor akActor)
 endFunction
 
 function StopWaitingActor(actor akActor)
-	if akActor.GetActorValue("WaitingForPlayer")
-		akActor.SetActorValue("WaitingForPlayer", 0)
-		akActor.EvaluatePackage()
-		Debug.Notification(akActor.GetDisplayName() + stopWaitingText)
-	endIf
+    if akActor.IsCommandedActor()
+        if akActor.IsUnconscious()
+            akActor.SetUnconscious(false)
+            Debug.Notification(akActor.GetDisplayName() + stopWaitingText)
+        endIf
+    elseIf akActor.GetActorValue("WaitingForPlayer")
+        akActor.SetActorValue("WaitingForPlayer", 0)
+        akActor.EvaluatePackage()
+        Debug.Notification(akActor.GetDisplayName() + stopWaitingText)
+    endIf
 endFunction
 
 function WaitActor(actor akActor)
-	if !akActor.GetActorValue("WaitingForPlayer")
-		akActor.SetActorValue("WaitingForPlayer", 1)
-		akActor.EvaluatePackage()
-		Debug.Notification(akActor.GetDisplayName() + waitingText)
-	endIf
+    if akActor.IsCommandedActor()
+        if !akActor.IsUnconscious()
+            akActor.SetUnconscious(true)
+            Debug.Notification(akActor.GetDisplayName() + waitingText)
+        endIf
+    elseIf !akActor.GetActorValue("WaitingForPlayer")
+        akActor.SetActorValue("WaitingForPlayer", 1)
+        akActor.EvaluatePackage()
+        Debug.Notification(akActor.GetDisplayName() + waitingText)
+    endIf
 endFunction
 
 bool function IsFollower(actor akActor)

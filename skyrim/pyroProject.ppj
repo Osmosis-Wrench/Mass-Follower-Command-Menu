@@ -9,7 +9,7 @@
     <Variables>
         <Variable Name="ModName" Value="Swiftly Order Squad"/>
         <Variable Name="MyProject" Value="."/>
-        <Variable Name="Ver" Value="1.5.0"/>
+        <Variable Name="Ver" Value="1.5.1"/>
         <Variable Name="Dist" Value="../bin"/>
     </Variables>
     <Imports>
@@ -19,6 +19,7 @@
         <Import>https://github.com/MrOctopus/nl_online/tree/main/sse/source</Import>
         <Import>https://github.com/Ryan-rsm-McKenzie/ConsoleUtilSSE/tree/master/src/papyrus</Import>
         <Import>https://github.com/MrOctopus/nl_online/tree/main/skyui/source</Import>
+        <Import>https://github.com/powerof3/PapyrusExtenderSSE/tree/master/src/Papyrus</Import>
     </Imports>
     <Folders>
         <Folder>@MyProject\Source\Scripts</Folder>
